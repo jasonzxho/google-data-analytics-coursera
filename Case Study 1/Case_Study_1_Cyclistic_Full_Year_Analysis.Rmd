@@ -485,16 +485,16 @@ all_trips_v2 %>%
              fill = member_casual)) +
     geom_col(position = "dodge") +
     theme(text = element_text(family = "encodesans-sc"),
-          legend.background = element_rect(fill = "transparent"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
           legend.key = element_rect(fill = "transparent"),
           legend.position = "bottom",
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -514,7 +514,7 @@ all_trips_v2 %>%
     scale_x_discrete(expand = c(0, 0)) + 
     scale_y_continuous(labels = scales::comma, 
                        expand = c(0, 0)) +
-    ggsave('data/processed/graphs/dow_rides.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/dow_rides.png', width = 6.5, height = 4.5, bg = "#fcfcfc")      # match colour with presentation deck background
 ```
 
 This visualization shows that over the days of the week, member riders take more trips than casual riders while casual riders peak above members on the weekends.
@@ -533,16 +533,16 @@ all_trips_v2 %>%
              fill = member_casual)) +
     geom_col(position = "dodge") +
     theme(text = element_text(family = "encodesans-sc"),
-          legend.background = element_rect(fill = "transparent"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
           legend.key = element_rect(fill = "transparent"),
           legend.position = "bottom",
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -562,7 +562,7 @@ all_trips_v2 %>%
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_continuous(labels = scales::comma, 
                        expand = c(0, 0)) +
-    ggsave('data/processed/graphs/dow_ride_duration.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/dow_ride_duration.png', width = 6.5, height = 4.5, bg = "#fcfcfc")      # match colour with presentation deck background
 ```
 
 This visualization shows that over the days of the week, the average ride duration for casual riders ride is over twice as long on as member riders, peaking on the weekends. Longer trip durations suggest that casual riders are using it more leisure trips compared to simple A to B destination travel.
@@ -583,17 +583,17 @@ all_trips_v2 %>%
              fill = member_casual)) +
     geom_col(position = "dodge") +
     theme(text = element_text(family = "encodesans-sc"),
-          legend.background = element_rect(fill = "transparent"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
           legend.direction = "horizontal",
           legend.key = element_rect(fill = "transparent"),
           legend.position = "bottom",
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -613,7 +613,7 @@ all_trips_v2 %>%
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_continuous(labels = scales::percent, 
                        expand = c(0, 0)) +
-    ggsave('data/processed/graphs/dow_rt_pct.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/dow_rt_pct.png', width = 6.5, height = 4.5, bg = "#fcfcfc")      # match colour with presentation deck background
 ```
 
 This visualization shows that over the days of the week, casual riders take more than three times the percentage points of round trips (start and end station is the same) than member riders. This further suggests that more casual riders use the service for A to A travel than for A to B travel.
@@ -636,12 +636,12 @@ all_trips_v2 %>%
           legend.key = element_rect(fill = "transparent"),
           legend.position = c(.935,.875),
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -664,7 +664,7 @@ all_trips_v2 %>%
     scale_x_date(breaks = date_breaks("1 month"),
                  expand = c(0,0),
                  date_labels = "%b-%Y") +
-    ggsave('data/processed/graphs/monthly_rides.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/monthly_rides.png', width = 6.5, height = 4.5, bg = "#fcfcfc")      # match colour with presentation deck background
 ```
 
 This visualization shows that over the months of the year, members take more rides throughout the year with casual riders coming the closest to parity in July, with both members and casual riders peaking in the summer months and dipping to the lowest in the winter months. This suggests that the warmer the weather the more people will riding and using the bike share service.
@@ -686,12 +686,12 @@ all_trips_v2 %>%
           legend.key = element_rect(fill = "transparent"),
           legend.position = c(.935,.875),
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -714,7 +714,7 @@ all_trips_v2 %>%
     scale_x_date(breaks = date_breaks("1 month"),
                  expand = c(0,0),
                  date_labels = "%b-%Y") +
-    ggsave('data/processed/graphs/monthly_trip_duration.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/monthly_trip_duration.png', width = 6.5, height = 4.5, bg = "#fcfcfc")      # match colour with presentation deck background
 ```
 
 This visualization shows that over the months of the year, average ride duration for casual riders are the highest in the late spring and summer. However average ride duration for casual riders peak again in February, which may be explained away by having the low usage numbers in that month. Average ride duration for members consistently fall below 20 minutes throughout the year further proving that members use it more for short A to B travel and casual riders use the service for long leisure travel.
@@ -738,12 +738,12 @@ all_trips_v2 %>%
           legend.key = element_rect(fill = "transparent"),
           legend.position = c(.935,.875),
           legend.title = element_text(size = 10),
-          plot.background = element_rect(fill = "transparent"),
+          plot.background = element_rect(fill = "#fcfcfc"),       # match colour with presentation deck background
           plot.caption = element_text(colour = "grey30",
                                       size = 8, 
                                       hjust = 1),
           plot.title = element_text(margin = margin(b = 15)),
-          panel.background = element_rect(fill = "transparent"),
+          panel.background = element_rect(fill = "#fcfcfc"),      # match colour with presentation deck background
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_line(size = .1, 
                                             colour = "lightgrey"),
@@ -767,7 +767,7 @@ all_trips_v2 %>%
     scale_x_date(breaks = date_breaks("1 month"),
                  expand = c(0,0),
                  date_labels = "%b-%Y") +
-    ggsave('data/processed/graphs/monthly_rt_pct.png', width = 6.5, height = 4.5, bg = "transparent")
+    ggsave('data/processed/graphs/monthly_rt_pct.png', width = 6.5, height = 4.5, bg = "#fcfcfc")       # match colour with presentation deck background
 ```
 
 This visualization shows that over the months of the year, round trips for both members and casual riders peak late spring and summer however the rate of round trips for casual riders are over twice the percentage points of that of member riders which proves that more casual riders use the service for A to A travel rather than for A to B travel throughout the year.
