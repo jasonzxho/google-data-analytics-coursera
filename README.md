@@ -4,7 +4,9 @@
 
 ### Introduction
 
-This R markdown notebook is an analysis is for Case Study 1 as part of the Google Data Analytics Certificate on Coursera.  Its originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman found [here](https://artscience.blog/home/divvy-dataviz-case-study). I will be using the Divvy data set for the case study found [here](https://divvy-tripdata.s3.amazonaws.com/index.html), between the dates of 2020-05-01 and 2021-04-30. 
+This R markdown notebook is an analysis is for Case Study 1 as part of the Google Data Analytics Certificate on Coursera.  Its originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman found [here](https://artscience.blog/home/divvy-dataviz-case-study). 
+
+I will be using the Divvy data set for the case study found [here](https://divvy-tripdata.s3.amazonaws.com/index.html), between the dates of 2020-05-01 and 2021-04-30. 
 
 The purpose of the R markdown is to consolidate the downloaded Divvy data into a single dataframe, then conduct an exploratory data analysis, and produce some visualizations to help answer the key question: “In what ways do members and casual riders use bikes differently?”
 
