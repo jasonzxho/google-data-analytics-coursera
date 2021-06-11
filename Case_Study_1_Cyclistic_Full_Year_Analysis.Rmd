@@ -1,0 +1,795 @@
+---
+title: "Cyclistic_Full_Year_Analysis"
+author: "Jason H"
+date: "2020/05/28"
+output: html_document
+---
+
+## Changelog
+_____________________________________________
+Version 1.0.0
+### Changes
+    - Edited provided code example with updated data sets and directory references
+    - Edited notebook section headings
+    
+### Fixes
+    - Fixed data cleaning code to include updated station names relating to maintenance and repair
+    
+Version 1.0.1
+### New
+    - Added alternative code to loop over list rather than reiterating over multiple lines of the same code
+    - Added more visualizations to include analysis over month to month
+
+### Changes
+    - Commented out old code made obsolete from loops
+
+Version 1.0.2
+### New
+    - Added code to clean `rideable_type` by updating previous bike type to 2021 classifications
+    - Added code to clean `start_station_id`, `end_station_id` by updating the previous numeric 2020 IDs to alphanumeric 2021 IDs
+    - Added code to average out `start_lat`, `start_lng`, `end_lat`, `end_lng` based on corresponding stations to work better with Tableau
+    
+Version 1.0.3 
+### New
+    - Added background information on the case study
+    
+### Changes
+    - Added theme code to change the look of charts to be more unified with the presentation slides
+    - Formatted & proofread comments
+_____________________________________________
+
+***
+
+# Cyclistic_Full_Year_Analysis
+
+## Introduction
+
+This R markdown notebook is an analysis is for Case Study 1 as part of the Google Data Analytics Certificate on Coursera.  Its originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman found [here](https://artscience.blog/home/divvy-dataviz-case-study). I will be using the Divvy data set for the case study found [here](https://divvy-tripdata.s3.amazonaws.com/index.html), between the dates of 2020-05-01 and 2021-04-30. 
+
+The purpose of this markdown is to consolidate the downloaded Divvy data into a single dataframe, then conduct an exploratory data analysis, and produce some visualizations to help answer the key question: “In what ways do members and casual riders use bikes differently?”
+
+## Background
+
+The following is taken from the background information on the fictional company in the case study:
+
+A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart by also offering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each day.
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime.
+
+Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to broad consumer segments. One approach that helped make these things possible was the flexibility of its pricing plans: single-ride passes, full-day passes, and annual memberships. Customers who purchase single-ride or full-day passes are referred to as casual riders. Customers who purchase annual memberships are Cyclistic members.
+
+Cyclistic’s finance analysts have concluded that annual members are much more profitable than casual riders. Although the pricing flexibility helps Cyclistic attract more customers, the Marketing Manager believes that maximizing the number of annual members will be key to future growth. Rather than creating a marketing campaign that targets all-new customers, the Marketing Manager believes there is a very good chance to convert casual riders into members. She notes that casual riders are already aware of the Cyclistic program and have chosen Cyclistic for their mobility needs.
+
+The Marketing Manager has set a clear goal: Design marketing strategies aimed at converting casual riders into annual members. In order to do that, however, the marketing analyst team needs to better understand how annual members and casual riders differ, why casual riders would buy a membership, and how digital media could affect their marketing tactics. The Marketing Manager and her team are interested in analyzing the Cyclistic historical bike trip data to identify trends.
+
+Three questions will guide the future marketing program:
+1. How do annual members and casual riders use Cyclistic bikes differently?
+2. Why would casual riders buy Cyclistic annual memberships?
+3. How can Cyclistic use digital media to influence casual riders to become members?
+
+The Marketing Manager has assigned us the first question to answer: How do annual members and casual riders use Cyclistic bikes differently?
+
+## Step 1: Load Packages
+
+In order to start cleaning our data, we will need to start by installing the required packages. If you have already installed and loaded `tidyverse`, `libridate`, `ggplot`, and `scales` in this session, feel free to skip the code chunks in this step.
+
+```{r Load Libraries}
+library(tidyverse)  # for data import & wrangling
+library(lubridate)  # for adding date attributes/functions
+library(ggplot2)    # for visualizing data
+library(scales)     # for scaling data in visualizations
+```
+
+## Step 2: Load Data
+
+Once packages are loaded, we will need to load in the data sets `csv` files that we previously downloaded [here](https://divvy-tripdata.s3.amazonaws.com/index.html). You may need to change the directory with the following commented out code if the working directory is different from this markdown.
+
+`getwd()`     # displays your working directory
+`setwd("")`   # sets working directory
+
+```{r Load Data}
+m5_2020 <- read_csv("data/raw/202005-divvy-tripdata.csv")
+m6_2020 <- read_csv("data/raw/202006-divvy-tripdata.csv")
+m7_2020 <- read_csv("data/raw/202007-divvy-tripdata.csv")
+m8_2020 <- read_csv("data/raw/202008-divvy-tripdata.csv")
+m9_2020 <- read_csv("data/raw/202009-divvy-tripdata.csv")
+m10_2020 <- read_csv("data/raw/202010-divvy-tripdata.csv")
+m11_2020 <- read_csv("data/raw/202011-divvy-tripdata.csv")
+m12_2020 <- read_csv("data/raw/202012-divvy-tripdata.csv")
+m1_2021 <- read_csv("data/raw/202101-divvy-tripdata.csv")
+m2_2021 <- read_csv("data/raw/202102-divvy-tripdata.csv")
+m3_2021 <- read_csv("data/raw/202103-divvy-tripdata.csv")
+m4_2021 <- read_csv("data/raw/202104-divvy-tripdata.csv")
+```
+
+## Step 3: Data Wrangling
+
+Now that the csv files are loaded into the environment, we will need to compare the column names in each dataframe to make sure they match before we can join them into one single dataframe.
+
+```{r}
+
+# colnames(m5_2020)
+# colnames(m6_2020)
+# colnames(m7_2020)
+# colnames(m8_2020)
+# colnames(m9_2020)
+# colnames(m10_2020)
+# colnames(m11_2020)
+# colnames(m12_2020)
+# colnames(m1_2021)
+# colnames(m2_2021)
+# colnames(m3_2021)
+# colnames(m4_2021)
+
+# or we can loop over a list as shown below
+
+list <- list(m5_2020, m6_2020, m7_2020, m8_2020, m9_2020, m10_2020, m11_2020, m12_2020, m1_2021, m2_2021, m3_2021, m4_2021)
+
+for (i in 1:length(list)) {
+  print(colnames(list[[i]]))
+}
+```
+
+Since all the columns have the same names, we do not need to rename any of them. However if we did, we would use the following commented out code to rename them accordingly.
+Rename columns to make them consisent with q1_2020 (as this will be the supposed going-forward table design for Divvy)
+
+(*dataframe* <- rename(*dataframe*
+                   ,ride_id = 
+                   ,rideable_type =  
+                   ,started_at =   
+                   ,ended_at =   
+                   ,start_station_name =  
+                   ,start_station_id =  
+                   ,end_station_name =  
+                   ,end_station_id =  
+                   ,member_casual = ))
+
+Next we inspect the dataframes and look for incongruencies
+
+```{r}
+# str(m5_2020)
+# str(m6_2020)
+# str(m7_2020)
+# str(m8_2020)
+# str(m9_2020)
+# str(m10_2020)
+# str(m11_2020)
+# str(m12_2020)
+# str(m1_2021)
+# str(m2_2021)
+# str(m3_2021)
+# str(m4_2021)
+
+# or we can loop over a list as shown below
+
+for (i in 1:length(list)) {
+  str(list[[i]])
+}
+```
+
+It appears that Divvy data set started using alphanumeric characters in their `start_station_id` and `end_station_id` rather than numeric in December 2020. Since we cannot change them into numeric datatype, we will need convert all the `start_station_id` and `end_station_id` in 2020 into character data type as well so that they can stack correctly.
+
+```{r}
+m5_2020 <-  mutate(m5_2020, start_station_id = as.character(start_station_id),
+                            end_station_id = as.character(end_station_id))
+m6_2020 <-  mutate(m6_2020, start_station_id = as.character(start_station_id),
+                            end_station_id = as.character(end_station_id))
+m7_2020 <-  mutate(m7_2020, start_station_id = as.character(start_station_id),
+                            end_station_id = as.character(end_station_id))
+m8_2020 <-  mutate(m8_2020, start_station_id = as.character(start_station_id),
+                            end_station_id = as.character(end_station_id))
+m9_2020 <-  mutate(m9_2020, start_station_id = as.character(start_station_id),
+                            end_station_id = as.character(end_station_id))
+m10_2020 <- mutate(m10_2020, start_station_id = as.character(start_station_id),
+                             end_station_id = as.character(end_station_id))
+m11_2020 <- mutate(m11_2020, start_station_id = as.character(start_station_id),
+                             end_station_id = as.character(end_station_id))
+m12_2020 <- mutate(m12_2020, start_station_id = as.character(start_station_id),
+                             end_station_id = as.character(end_station_id))
+
+# Tried to use a loop to condense the code above but was not successful.
+```
+
+Now that we finished changing the data types we can stack the monthly dataframes into one big dataframe.
+
+```{r}
+all_trips <- bind_rows(m5_2020, m6_2020, m7_2020, m8_2020, m9_2020, m10_2020, m11_2020, m12_2020, m1_2021, m2_2021, m3_2021, m4_2021)
+```
+
+## Step 4: Data Cleaning & Manipulation
+
+Inspect the new aggregated dataframe.
+
+```{r}
+colnames(all_trips)     # List of column names
+nrow(all_trips)         # How many rows are in data frame?
+dim(all_trips)          # Dimensions of the data frame?
+head(all_trips)         # See the first 6 rows of data frame.  Also tail(qs_raw)
+str(all_trips)          # See list of columns and data types (numeric, character, etc)
+summary(all_trips)      # Statistical summary of data, mainly numeric
+```
+
+### Issues that need to be fixed:
+(1) The data can only be aggregated at the ride-level, which is too granular. We will need to add some additional columns of data such as day, month, year that provide additional                  opportunities to aggregate the data.
+(2) We will need to add a calculated field for ride duration since the data set did not have the `ride_duration` column therefore we will add it to the entire dataframe for consistency.
+(3) There are some rides where `ride_duration` shows up as negative, including several hundred rides where Divvy took bikes out of circulation for maintenance/repair reasons. We will need to      delete these rides.
+(4) As we previously found, the station IDs changed in December 2020 to alphanumeric characters from numeric characters therefore we will need to change them all to the new station IDs for        consistency and analysis.
+(5) `rideable_type` was also changed in December 2020 whereby Divvy added eBikes to the fleet and changed the 'docked_bike" to "classic_bike". We will need to change the old bike                  classifications to the new classifications for consistency as well.
+(6) Because of the addition of eBikes to the fleet that allow for undocked release of rides, the latitude and longitude coordinates are slightly off that throws off the tally of trips when        mapped. Therefore we will need to amend the coordinates with an averaging all trips from the same station rounded to 5 decimal places.
+
+### Issue 1: Add columns that list the date, month, day, and year of each ride
+
+This will allow us to aggregate ride data for each `month`, `day`, or `year` in R, before completing these operations we could only aggregate at the ride level.
+See [here](https://www.statmethods.net/input/dates.html)for more on date formats in R.
+
+```{r}
+all_trips$date <- as.Date(all_trips$started_at) #The default format is yyyy-mm-dd
+all_trips$month <- format(as.Date(all_trips$date), "%m")
+all_trips$day <- format(as.Date(all_trips$date), "%d")
+all_trips$year <- format(as.Date(all_trips$date), "%Y")
+all_trips$day_of_week <- format(as.Date(all_trips$date), "%A")
+```
+
+### Issue 2: Add a `ride_duration` calculation to `all_trips` (in seconds)
+
+This will allow us to perform analysis on `ride_duration` and gain insights on how different casual riders and member riders use the service differently. 
+See [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/difftime.html)for reference on `difftime` function.
+
+```{r}
+all_trips$ride_duration <- difftime(all_trips$ended_at,all_trips$started_at)
+```
+
+Inspect the structure of the dataframe columns after the new additions.
+
+```{r}
+str(all_trips)
+```
+
+All the column datatypes look correct, we need to convert `ride_duration` from `difftime` to `numeric` so that we can run calculations on the data.
+
+```{r}
+is.factor(all_trips$ride_duration)
+
+all_trips$ride_duration <- as.numeric(as.character(all_trips$ride_duration))
+
+is.numeric(all_trips$ride_duration)
+```
+
+### Issue 3: Removing rides with negative `ride_duration`
+
+The trip count numbers are different slightly suggesting there are trips taken from active stations to the Service Centres. Therefore I will also need to drop trips that end at the locations identified previously. 
+
+First we will need to check the `ride_duration` statistics to reveal any issues that need to be addressed.
+
+```{r}
+summary(all_trips$ride_duration)
+```
+
+As previously stated, there are negative `ride_duration` that need to be removed as rides cannot be negative in duration, but before we do so, lets group the start stations together and inspect the dataframe to see if there are any that should be removed as it would not be used by the general public.
+
+```{r}
+trip_start_count <- 
+  all_trips %>%
+  group_by(start_station_name) %>%
+  count(start_station_name)
+```
+
+Upon inspection of the aggregated trip counts, the following locations were found to be used by Divvy for maintenance/repair: 
+    - Base - 2132 W Hubbard Warehouse, 
+    - HUBBARD ST BIKE CHECKING (LBS-WH-TEST)
+    - WATSON TESTING - DIVVY 
+    
+We will need to remove these stations as these do not contribute to our statistical analysis of bike usage. Inspection of the dataframe also found thousands of trips with start station will Null values. Just to be thorough, I will also check the end stations and see if there were trips for bikes taken to Divvy Service Centres that were identified before.
+
+```{r}
+trip_end_count <- 
+  all_trips %>%
+  group_by(end_station_name) %>%
+  count(end_station_name)
+```
+
+Along with the same locations that need to be removed, there were several thousand trips with NULL values as well. Next we will need to determine the percentage of null values that exist to see what sort of statistical variance this will cause our analysis.
+
+```{r}
+print(paste0("Percentage of null values in dataframe: ", (round(mean(is.na(all_trips))*100, digits=2)),"%"))
+```
+
+Because there is less than 1% of data missing, we can move ahead of removing these null values as it would not have any statistical significance.
+
+We will be creating a new version of the dataframe (v2) since data is being removed and we want to keep the original in case anything goes wrong.
+See [here](https://www.datasciencemadesimple.com/delete-or-drop-rows-in-r-with-conditions-2/) for references on how to delete or drop rows in a dataframe.
+
+
+```{r}
+# Count the number of unwanted entries that will need to be removed
+count(all_trips[(all_trips$start_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                 all_trips$end_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                 all_trips$start_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                 all_trips$end_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                 all_trips$start_station_name == "WATSON TESTING - DIVVY" |
+                 all_trips$end_station_name == "WATSON TESTING - DIVVY" |
+                 all_trips$ride_duration < 0),])
+
+# Select the inverse of the unwanted entries and save it to a new dataframe
+all_trips_v2 <- all_trips[!(all_trips$start_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                            all_trips$end_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                            all_trips$start_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                            all_trips$end_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                            all_trips$start_station_name == "WATSON TESTING - DIVVY" |
+                            all_trips$end_station_name == "WATSON TESTING - DIVVY" |
+                            all_trips$ride_duration < 0),]
+
+# Drop null values
+all_trips_v2 <- all_trips_v2[complete.cases(all_trips_v2),]
+
+# Count the new dataframe to see if there are any remaining unwanted entries
+count(all_trips_v2[(all_trips_v2$start_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                    all_trips_v2$end_station_name == "Base - 2132 W Hubbard Warehouse" | 
+                    all_trips_v2$start_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                    all_trips_v2$end_station_name == "HUBBARD ST BIKE CHECKING (LBS-WH-TEST)" |
+                    all_trips_v2$start_station_name == "WATSON TESTING - DIVVY" |
+                    all_trips_v2$end_station_name == "WATSON TESTING - DIVVY" | 
+                    all_trips_v2$ride_duration < 0),])
+```
+
+Looks like we were successful in removing unwanted records in our dataframe with the removal of almost 250,000 entries.
+
+### Issue 4: Changing data type for Station IDs from numeric to alphanumeric
+
+```{r}
+# First we need to group by start stations and change the data type for start_station_id
+all_trips_v2 <- 
+  all_trips_v2 %>%
+  arrange(start_station_name, date) %>% 
+  group_by(start_station_name) %>% 
+  mutate(across(c(start_station_id), last)) %>%
+  ungroup()
+
+# Next we need to group by end stations and change the data type for end_station_id
+all_trips_v2 <-
+  all_trips_v2 %>%
+  arrange(end_station_name, date) %>% 
+  group_by(end_station_name) %>% 
+  mutate(across(c(end_station_id), last)) %>%
+  ungroup()
+```
+
+### Issue 5: Change old bike classification (pre Dec 2020) to match new classes 
+
+Divvy added eBikes to the fleet and changed the 'docked_bike" to "classic_bike" in December 2020. We will need to change that to the new classification for consistency and proper analysis.
+
+```{r}
+all_trips_v2 %>%
+  group_by(rideable_type) %>%
+  summarise(number_of_rides = n())
+
+all_trips_v2["rideable_type"][all_trips_v2["rideable_type"] == "docked_bike"] <- "classic_bike"
+
+all_trips_v2 %>%
+  group_by(rideable_type) %>%
+  summarise(number_of_rides = n())
+```
+
+### Issue 6: Amalgamate the minor variances in latitute and longitude coordinates
+
+Because of the addition of eBikes to the fleet that allow for undocked release of rides, the latitude and longitude coordinates for trips are slightly off that throws off the tally when mapped. Therefore we will need to amend the coordinates with an averaging all trips from the same station rounded to 5 decimal places.
+
+```{r}
+# Amalgamate and average out start station latitude and longitude coordinates
+all_trips_v2 <-
+  all_trips_v2 %>%
+  group_by(start_station_name) %>% 
+  mutate(start_lat = round(mean(start_lat), digits=5)) %>%
+  mutate(start_lng = round(mean(start_lng), digits=5)) %>%
+  ungroup()
+
+# Amalgamate and average out end station latitude and longitude coordinates
+all_trips_v2 <-
+  all_trips_v2 %>%
+  group_by(end_station_name) %>% 
+  mutate(end_lat = round(mean(end_lat), digits=5)) %>% 
+  mutate(end_lng = round(mean(end_lng), digits=5)) %>%
+  ungroup()
+```
+  
+Now that we have finished all the cleaning all the data issues. We can write the cleaned data frame into a new `csv` file for further analysis in other software.
+  
+```{r}
+write_csv(all_trips_v2, file = 'data/processed/all_trips_cleaned.csv')          # export to .csv file for further analysis
+```
+
+## Step 5: Exploratory Data Analysis
+
+Descriptive analysis on ride_duration before and after data cleaning (all figures in seconds)
+
+```{r}
+print("Before Cleaning")
+summary(all_trips$ride_duration)
+print("After Cleaning")
+summary(all_trips_v2$ride_duration)
+```
+
+Based on the descriptive analysis, the median ride duration is 874 seconds or 14.6 minutes, the average ride duration is 1616 seconds or 26.9 minutes.
+
+Statistical comparison between members and casual users
+
+```{r}
+aggregate(all_trips_v2$ride_duration ~ all_trips_v2$member_casual, FUN = mean)
+aggregate(all_trips_v2$ride_duration ~ all_trips_v2$member_casual, FUN = median)
+aggregate(all_trips_v2$ride_duration ~ all_trips_v2$member_casual, FUN = max)
+aggregate(all_trips_v2$ride_duration ~ all_trips_v2$member_casual, FUN = min)
+```
+
+The average ride duration for casual riders is 2.7 times longer than member riders at 43 minutes with the median ride duration for casual riders at 21.4 minutes suggesting that while over half the rides are below 30 minutes it suggests that there are a number of rides being taken by casual riders using day passes which allow for unlimited 3 hour rides. Median member ride duration is only 11.4 minutes suggesting that a majority of members take very short trips and would rarely go over the 30min limit.
+
+Create dataframe for export based on number of rides by rider type and days of the week
+
+```{r}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>%                                # creates weekday field using wday()
+  group_by(member_casual, weekday) %>%                                                # groups by usertype and weekday
+  summarise(number_of_rides = n(),                                                    # calculates the number of rides
+            round_trips = sum(start_station_id==end_station_id),                      # calculates the number of round trips
+            percentage_rtrips = round(round_trips/number_of_rides*100, digits=2),     # calculates the percentage of round trips
+            average_duration_min = round(mean(ride_duration)/60, digits=2)) %>% 		    # calculates the average duration in minutes
+  arrange(member_casual, weekday) %>%	                                                # sorts
+  write_csv(file = 'data/processed/dow_stats.csv')                                    # export to .csv file for further analysis
+```
+
+Create dataframe for export based on number of rides by rider type and month of the year
+
+```{r}
+all_trips_v2 %>% 
+  mutate(mth = month(started_at, label = TRUE)) %>%                                   # creates month field using month()
+  group_by(member_casual, mth) %>%                                                    # groups by usertype and month
+  summarise(number_of_rides = n(),                                                    # calculates the number of rides
+            round_trips = sum(start_station_id==end_station_id),                      # calculates the number of round trips
+            percentage_rtrips = round(round_trips/number_of_rides*100, digits=2),     # calculates the percentage of round trips
+            average_duration_min = round(mean(ride_duration)/60, digits=2)) %>% 		    # calculates the average duration in minutes
+  arrange(member_casual, mth)	%>%	                                                    # sorts
+  write.csv(file = 'data/processed/monthly_stats.csv')                                # export to .csv file for further analysis
+```
+
+## Step 6: Data Visualizations
+
+Let's create some visualizations using the new dataframes we just created.
+
+Code was taken from various sources on Stack Overflow and [Datanovia](https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/).
+
+First we need to define some parameters for the visualizations such as the min and max dates.
+
+```{r}
+mindate <- min(all_trips_v2$date)
+maxdate <- max(all_trips_v2$date)
+options(scipen = 999) # changes the axis setting cutoff for scientific notation
+```
+
+```{r}
+# Adding font family that matches the presentation slide theme.
+library(showtext)
+font_add_google(name = "Encode Sans Semi Condensed", family = "encodesans-sc")
+showtext_auto() 
+```
+
+Let's create a visualization for the number of rides by rider type over the days of the week.
+
+```{r}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, 
+                        label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n()) %>% 
+  arrange(member_casual, weekday)  %>% 
+  ggplot(aes(x = weekday, 
+             y = number_of_rides, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "transparent"),
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = "bottom",
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +
+    labs(title = "Casual Rides Peak on Weekends While Member Rides Increase Gradually", 
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Day of the Week",
+         y = "Number of Rides") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_x_discrete(expand = c(0, 0)) + 
+    scale_y_continuous(labels = scales::comma, 
+                       expand = c(0, 0)) +
+    ggsave('data/processed/graphs/dow_rides.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the days of the week, member riders take more trips than casual riders while casual riders peak above members on the weekends.
+
+Next let's create a visualization for average trip duration by rider type over the days of week.
+
+```{r}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, 
+                        label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(average_duration_min = mean(ride_duration)/60) %>% 
+  arrange(member_casual, weekday)  %>% 
+  ggplot(aes(x = weekday, 
+             y = average_duration_min, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "transparent"),
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = "bottom",
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +
+    labs(title = "Casual Riders Take Longer Trips Than Members",
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Day of the Week",
+         y = "Average Ride Duration in Minutes") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_continuous(labels = scales::comma, 
+                       expand = c(0, 0)) +
+    ggsave('data/processed/graphs/dow_ride_duration.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the days of the week, the average ride duration for casual riders ride is over twice as long on as member riders, peaking on the weekends. Longer trip durations suggest that casual riders are using it more leisure trips compared to simple A to B destination travel.
+
+Now let's create a visualization for percentage of total round trips by rider type over the days of week.
+
+```{r}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, 
+                        label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n(),
+            round_trips = sum(start_station_id==end_station_id),
+            percentage_rtrips = round(round_trips/number_of_rides, digits=2)) %>% 
+  arrange(member_casual, weekday)  %>% 
+  ggplot(aes(x = weekday, 
+             y = percentage_rtrips, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "transparent"),
+          legend.direction = "horizontal",
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = "bottom",
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +
+    labs(title = "Casual Riders More Likely to Take Round Trips Than Members",
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Day of the Week",
+         y = "Percentage of Roundtrips") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_continuous(labels = scales::percent, 
+                       expand = c(0, 0)) +
+    ggsave('data/processed/graphs/dow_rt_pct.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the days of the week, casual riders take more than three times the percentage points of round trips (start and end station is the same) than member riders. This further suggests that more casual riders use the service for A to A travel than for A to B travel.
+
+We should also analyze how casual and member riders using the bike share differ over the months of the year.
+First let's create a visualization for total number of rides by rider type over the months.
+
+```{r}
+all_trips_v2 %>% 
+  group_by(member_casual, month = floor_date(date, "month")) %>% 
+  summarise(number_of_rides = n()) %>% 
+  arrange(member_casual, month)  %>% 
+  ggplot(aes(x = month, 
+             y = number_of_rides, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
+          legend.direction = "vertical",
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = c(.935,.875),
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +
+    labs(title = "Members Rides More Often Than Casual Riders Throughout the Year",
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Month",
+         y = "Number of Rides") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_y_continuous(labels = scales::comma, 
+                       expand = c(0, 0)) +
+    scale_x_date(breaks = date_breaks("1 month"),
+                 expand = c(0,0),
+                 date_labels = "%b-%Y") +
+    ggsave('data/processed/graphs/monthly_rides.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the months of the year, members take more rides throughout the year with casual riders coming the closest to parity in July, with both members and casual riders peaking in the summer months and dipping to the lowest in the winter months. This suggests that the warmer the weather the more people will riding and using the bike share service.
+
+Next let's create a visualization for average trip duration by rider type over the months.
+
+```{r}
+all_trips_v2 %>% 
+  group_by(member_casual, month = floor_date(date, "month")) %>% 
+  summarise(average_duration = mean(ride_duration)/60) %>% 
+  arrange(member_casual, month)  %>% 
+  ggplot(aes(x = month, 
+             y = average_duration, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
+          legend.direction = "vertical",
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = c(.935,.875),
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +
+    labs(title = "Casual Ride Trip Length Peaks in the Late Spring to Summer",
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Month",
+         y = "Average Duration in Minutes") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_y_continuous(breaks = seq(0, 60, by = 10), 
+                       expand = c(0, 0)) +
+    scale_x_date(breaks = date_breaks("1 month"),
+                 expand = c(0,0),
+                 date_labels = "%b-%Y") +
+    ggsave('data/processed/graphs/monthly_trip_duration.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the months of the year, average ride duration for casual riders are the highest in the late spring and summer. However average ride duration for casual riders peak again in February, which may be explained away by having the low usage numbers in that month. Average ride duration for members consistently fall below 20 minutes throughout the year further proving that members use it more for short A to B travel and casual riders use the service for long leisure travel.
+
+Finally let's create a visualization for percentage of total round trips by rider type over the months.
+
+```{r}
+all_trips_v2 %>% 
+  group_by(member_casual, month=floor_date(date, "month")) %>% 
+  summarise(number_of_rides = n(),
+            round_trips = sum(start_station_id==end_station_id),
+            percentage_rtrips = round(round_trips/number_of_rides, digits=2)) %>%  
+  arrange(member_casual, month)  %>% 
+  ggplot(aes(x = month, 
+             y = percentage_rtrips, 
+             fill = member_casual)) +
+    geom_col(position = "dodge") +
+    theme(text = element_text(family = "encodesans-sc"),
+          legend.background = element_rect(fill = "#fcfcfc"),     # match colour with presentation deck background
+          legend.direction = "vertical",
+          legend.key = element_rect(fill = "transparent"),
+          legend.position = c(.935,.875),
+          legend.title = element_text(size = 10),
+          plot.background = element_rect(fill = "transparent"),
+          plot.caption = element_text(colour = "grey30",
+                                      size = 8, 
+                                      hjust = 1),
+          plot.title = element_text(margin = margin(b = 15)),
+          panel.background = element_rect(fill = "transparent"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = .1, 
+                                            colour = "lightgrey"),
+          panel.grid.minor = element_blank(),
+          axis.line = element_line(colour = "black", 
+                                   size = .1),
+          axis.ticks = element_line(size = 0.1),
+          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+          axis.title.x = element_text(margin = margin(t = 15)),
+          axis.title.y = element_text(margin = margin(r = 15))) +    
+    labs(title = "Round Trips Peak in Late Spring Continuing into Summer",
+         caption = paste0("Data source: Divvy", "\nData from: ", mindate, " to ", maxdate),
+         x = "Month",
+         y = "Percentage of Round Trips") +
+    scale_fill_manual(name = "Rider Type", 
+                      labels = c("Casual", "Member"),
+                      values = c("#3695a6", "#3db7e4")) +        # obtained colour from Divvy & Cyclistic
+    scale_y_continuous(breaks = seq(0, 0.25, by = 0.05),
+                       labels = scales::percent,
+                       expand = c(0, 0)) +
+    scale_x_date(breaks = date_breaks("1 month"),
+                 expand = c(0,0),
+                 date_labels = "%b-%Y") +
+    ggsave('data/processed/graphs/monthly_rt_pct.png', width = 6.5, height = 4.5, bg = "transparent")
+```
+
+This visualization shows that over the months of the year, round trips for both members and casual riders peak late spring and summer however the rate of round trips for casual riders are over twice the percentage points of that of member riders which proves that more casual riders use the service for A to A travel rather than for A to B travel throughout the year.
+
+## Step 7: Conclusions
+
+### Days of Week Trends
+- The number of member rides throughout the days of the week surpass casual rides except on weekends (Saturdays & Sundays) suggesting that casual members use the bikes more for leisure travel   than everyday commuting.
+- Average ride duration throughout the week for casual riders are more than double that of member riders (40 minutes+ for casual riders vs 15 minutes+ for member riders) with it peaking on      weekends also further suggesting that casual members use it more for leisure travel than for commuting purposes.
+- More than three times the percentages points, 15%+ for casual riders vs 5%+ for member riders, complete round trips vs one-way trips. This coupled with the long average ride duration and      high number of rides on weekends and evenings for casuals riders further solidifies the hypothesis that casual riders mainly use the bike share program for leisure purposes whereas the the    short average ride duration, high number of rides throughout the week, and low percentage of round trips corroborates the hypothesis that members use the bike share program more for           commuting purposes. 
+
+### Monthly Trends
+- Total number of rides throughout the year peaks in the summer months and dips the most in the winter months which suggest bike share usage corrolates closely with warm weather.
+- Percentage of total round trips peak for the early summer months (May, June, July) going above 20% with average trip duration above 50 minutes for the same period, highly suggesting that      casual riders are mainly tourists visiting the city over the summer months. The average trip duration for member riders all fall below 20 minutes with less than 10% of trips are round trips   suggesting that riders only become members to use the bikes for commuting purposes. 
+
+### Suggestions
+- Provide membership plans tailored to target casual riders that ride over 30 minutes or specifically Day Pass Users by developing Weekend Membership Plans or Summer Membership Plans.
+- Provide bonus rates for riders that drop off bikes at under utilized stations or stations that have low stock of bikes.
+- Provide a special day rate for round trip usage.
+
+### Next Steps
+- Complete a more thorough analysis in Tableau by diving deeper into data and granularity (hour by hour & station usage breakdown).
+
+
+
